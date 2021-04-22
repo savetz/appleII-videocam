@@ -1,0 +1,1700 @@
+-------------------------------------------- SCREEN 000
+( VIDEO-CAM - HARDWARE   < 5/31/84>140) 
+                                        
+THE VIDEO-CAM HARDWARE CONSISTS OF AN   
+INTERFACE, A VIDEO CAMERA, AND          
+INTERCONNECTING CABBLES.                
+                                        
+INTERFACE DESCRITION:                   
+                                        
+THE VIDEO INTERFACE CARD (MANUFACTURED  
+BY THE COMPUTER INSTITUTE, BRUNSWICK ME 
+04011) CONTAINS THE NECESSARY CIRCUTRY  
+TO SYCHRONIZE THE COMPUTER AND THE      
+CAMERA SIGNALS AS WELL AS ALLOWING THE  
+VALUE OF THE TV SIGNAL TO BE COMPARED   
+WITH TWO THRESHOLD VALUES               
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 001
+( VIDEO-CAM - HARDWARE   < 5/31/84>141) 
+                                        
+CABLE CONNECTIONS:                      
+                                        
+FOR // or //+                           
+                                        
+THE GREEN WIRE WITH THE CLIP SHOULD BE  
+CONNECTED TO PIN 8 OF CHIP C13  (THE    
+TOP LEFT PIN OF THE SECOND CHIP FROM    
+THE RIGHT IN ROW C)                     
+                                        
+FOR //E                                 
+  Pin 39 of CHIP at D5-6 (2nd pin from  
+  the bottom on the left)               
+                                        
+THE TAN WIRE WITH THE 4 PIN BROWN BERG  
+CONNECTOR SHOULD BE PLUGGED INTO THE    
+EXTERNAL VIDEO JACK OF THE APPLE WITH   
+THE TWO WIRE FACING AWAY FROM THE POWER 
+SUPPLY (THE EXTERNAL VIDEO JACK IS      
+LOCATED AT THE RIGHT REAR OF THE        
+COMPUTER                                
+                                        
+                                        
+-------------------------------------------- SCREEN 002
+( VIDEO-CAM - NOTES      < 5/31/84>142) 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               ( 11:30) 
+-------------------------------------------- SCREEN 003
+( VIDEO-CAM - NOTES      < 5/31/84>143) 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               ( 11:30) 
+-------------------------------------------- SCREEN 004
+( VIDEO-CAM - NOTES      < 5/31/84>144) 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               ( 11:30) 
+-------------------------------------------- SCREEN 005
+( VIDEO-CAM - LOAD SCREEN< 5/31/84>145) 
+                                        
+: VID-CAM ;                             
+                                        
+( 170 171 THRU ( Y ADDRESS TABLE )      
+164     LOAD ( VARIABLES )              
+218     LOAD ( PAK )                    
+163     LOAD ( GRAPHICS STUFF )         
+146 162 THRU ( SCAN SCREEN ROUTINE )    
+165     LOAD ( INPUT )                  
+210 214 THRU ( DIRECTORY STUFF )        
+190 193 THRU ( SAVE AS IBM )            
+230 232 THRU ( SAVE AS APPLE )          
+235 236 THRU ( INIT DISK )              
+167     LOAD ( PRBOX )                  
+200 205 THRU ( COM-LINK STUFF )         
+219 229 THRU ( MENU STUFF )             
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 006
+( ASSEM CONSTANTS/VARS   < 5/31/84>146) 
+                                        
+32 CONSTANT DENSLT ( 16*SLOT OF CARD )  
+                                        
+( -----------------------------------)  
+( THE FOLLOWING VARIABLES ARE PASSED )  
+( TO THE SCAN ROUTINE                )  
+( ---------------------------------- )  
+VARIABLE UPR ( UPPER INTENSITY LIMIT )  
+VARIABLE LWR ( LOWER INTENSITY LIMIT )  
+                                        
+( -----------------------------------)  
+( THE FOLLOWING VARIABLES ARE PASSED )  
+( TO AND RETURNED BY THE READ ROUTINE)  
+( ---------------------------------- )  
+VARIABLE RDX ( X COORDINATE OF POINT )  
+VARIABLE RDY ( Y                     )  
+VARIABLE PVAL ( RETURNED INTENSTIY   )  
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 007
+( WORKING STORAGE        < 5/31/84>147) 
+                                        
+ASSEMBLER                               
+                                        
+VARIABLE MASK ( BYTE MASK )             
+VARIABLE OFFS ( OFFSET FROM START OF    
+              ( GRAPHICS LINE IN BYTES) 
+N 4 + CONSTANT GRPT ( GRAPHICS POINTER) 
+GRPT CONSTANT GRPTL ( LOW BYTE OF )     
+GRPT 1+ CONSTANT GRPTH ( HIGH BYTE OF ) 
+CREATE PBUF 195 ALLOT                   
+   ( PLOT BUFFER FOR POINTS IN SCAN )   
+VARIABLE PBOFFS                         
+VARIABLE COL                            
+VARIABLE TEMP                           
+VARIABLE LCOL   255 LCOL !              
+VARIABLE NUMR   192 NUMR !              
+VARIABLE COLOR                          
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 008
+( CARD I/O DEFINITIONS   < 5/31/84>148) 
+                                        
+( ALL CONSTANTS DEFINED HERE ASSUME THE 
+  CARD IS INSTALLED IN SLOT 0, WHICH IS 
+  NOT ALLOWED, THIS OFFSET IS THEN      
+  INDEXED TO THE PROPER SLOT BY ADDING  
+  THE VALUE OF DENSLT TO THE CONSTANTS) 
+                                        
+HEX                                     
+                                        
+C08A CONSTANT STATUS ( STATUS BYTE )    
+C08B CONSTANT COLUMN ( COLUMN NUMBER )  
+C08C CONSTANT UPRLIM ( UPPER LIMIT )    
+C08D CONSTANT LWRLIM ( LOWER LIMIT )    
+                                        
+DECIMAL                                 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               ( 13:22) 
+-------------------------------------------- SCREEN 010
+( SCANSCR: SINIT         < 5/31/84>150) 
+                                        
+: SINIT                                 
+  0 OFFS !   ( ZERO BYTE OFFSET )       
+  1 MASK !   ( INITIAL PLOT MASK )      
+  0 COL !    ( SET STARTING COLUMN )    
+                                        
+  UPR @ UPRLIM DENSLT + C! ( SET CARD ) 
+  LWR @ LWRLIM DENSLT + C! ( REGSTERS ) 
+  COL @ COLUMN DENSLT + C!              
+                                        
+;                                       
+EXIT                                    
+                                        
+IF COL IS CHANGED TO A VALUE OTHER THAN 
+ZERO THE INITIAL MASK AND OFFS MUST BE  
+CHANGED SO THE FIRST PIXEL PLOTTED WILL 
+BE OVER THE POINT ACTUALLY READ         
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 011
+( SCANSCR: WAIT-VSYNC    < 5/31/84>151) 
+                                        
+CODE WAIT-VSYNC ( WAIT FOR THE RISING   
+       AND FALLING EDGE OF VSYNC )      
+                                        
+  DENSLT # LDX,                         
+  BEGIN,                                
+   STATUS ,X LDA,                       
+   .A ROL,                              
+  CS UNTIL, ( WAIT FOR ACTIVE )         
+                                        
+  BEGIN,                                
+   STATUS ,X LDA,                       
+   .A ROL,                              
+  CS NOT UNTIL, ( WAIT FOR INACTIVE )   
+  RTS,                                  
+END-CODE                                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               ( 13:22) 
+-------------------------------------------- SCREEN 012
+( BLANK                  < 5/31/84>152) 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               ( 13:22) 
+-------------------------------------------- SCREEN 013
+( SCANSCR: GETANS        < 5/31/84>153) 
+                                        
+EXIT                                    
+                                        
+CODE GETANS ( WAITS FOR AN ANSWER AND   
+    RETURNS STATUS IN ACCUMULATOR       
+ -- STATUS BYTE IS SHIFTED RIGHT 1 -- ) 
+                                        
+  DENSLT # LDX,  ( GET CARD OFFSET )    
+  BEGIN,                                
+   STATUS ,X LDA,                       
+   .A ROR,                              
+  CS UNTIL,                             
+  RTS,                                  
+END-CODE                                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 014
+( SCANSCR: !PBUF         < 5/31/84>154) 
+                                        
+CODE !PBUF ( STORE INTO PLOT BUFFER     
+       IF POINT FOUND )                 
+  BEGIN,                                
+   BEGIN,  ( READ AN ANSWER FROM CARD ) 
+    STATUS ,X LDA,                      
+    .A ROR,                             
+   CS UNTIL,                            
+   .A ROR, ( MOVE BIT 1, WITHIN WINDOW) 
+   CS NOT IF, ( IF IN WINDOW            
+ --  ^^^ REVERSE LOGIC 0=TRUE -- )      
+    TYA,     ( GET NUMBER OF ROW )      
+    PBOFFS LDY,                         
+    PBUF ,Y STA, ( STORE POINT )        
+    PBOFFS INC,                         
+    TAY,                                
+   THEN,                                
+   DEY,                                 
+   0= UNTIL,                            
+  RTS,                                  
+END-CODE                                
+                                        
+                                        
+-------------------------------------------- SCREEN 015
+( SCANSCR: SETGRPT1      < 5/31/84>155) 
+                                        
+CODE SETGRPT1 ( SET GRPT WHEN ROW IS    
+  LESS THAN 128, ROW IN A, X ALTERED)   
+                                        
+  CLC,                                  
+  .A ROL,  ( TIMES TWO )                
+  TAX,                                  
+  YADDRESS ,X LDA, ( GET LSB OF Y ADDR) 
+  GRPTL STA,                            
+  YADDRESS 1+ ,X LDA, ( GET MSB )       
+  CLC,       ( ADD OFFSET TO PAGE TWO ) 
+  32 # ADC,                             
+  GRPTH STA,                            
+  RTS,                                  
+END-CODE                                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 016
+( SCANSCR: SETGRPT2      < 5/31/84>156) 
+                                        
+CODE SETGRPT2 ( SET GRPT WHEN ROW IS    
+  GRTR THAN 127, ROW IN A, X ALTERED    
+  128 SUBTRACTED HERE )                 
+                                        
+  127 # AND,   ( SUBTRACT 128 )         
+  CLC,                                  
+  .A ROL,  ( TIMES TWO )                
+  TAX,                                  
+  YADDRESS 256 + ,X LDA, ( GET LSB )    
+  GRPTL STA,                            
+  YADDRESS 257 + ,X LDA, ( GET MSB )    
+  CLC,      ( ADD OFFSET TO PAGE TWO )  
+  32 # ADC,                             
+  GRPTH STA,                            
+  RTS,                                  
+END-CODE                                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 017
+( SCANSCR: PLOTPT        < 5/31/84>157) 
+                                        
+CODE PLOTPT ( PLOT THE POINT AT ROW IN  
+  THE ACCUM USING MASK AND OFFS )       
+                                        
+  .A ROL, ( MOVE BIT 7 TO CARRY )       
+  CS IF, .A ROR, ' SETGRPT2 JSR,        
+   ELSE, .A ROR, ' SETGRPT1 JSR, THEN,  
+  TEMP STY,                             
+  OFFS LDY, ( GET OFFSET FROM LINE )    
+  MASK LDA, ( BIT MASK )                
+  GRPT )Y ORA, ( OR IN THE MASK )       
+  GRPT )Y STA, ( STORE IT )             
+  TEMP LDY,                             
+  RTS,                                  
+END-CODE                                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 018
+( SCANSCR: PLOTBUF       < 5/31/84>158) 
+CODE PLOTBUF ( PLOT THE POINTS IN THE   
+   PLOT BUFFER )                        
+  COLOR LDA,  ( GET PLOT COLOR # )      
+  3 # AND, 3 # CMP, ( MASK HI BITS )    
+  0= NOT IF, ( NOT WHITE TEST IF THIS.) 
+   1 # AND, ( COLUMN SHOULD BE PLOTTED) 
+   COL EOR, ( IF MATCH THEN PLOT )      
+   1 # AND,                             
+  THEN,     ( DONE CHECKING )           
+  0= IF,  ( THIS SHOULD BE PLOTTED )    
+   PBOFFS LDY, ( NUMBER OF POINTS )     
+   0= NOT IF,  ( THERE ARE POINTS )     
+    BEGIN,                              
+     DEY,         ( PREDECREMENT )      
+     NUMR LDA,   ( IN PBUF NUMR IS THE) 
+     SEC,         ( TOP ROW, CHANGE IT) 
+     PBUF ,Y SBC, ( SO TOP IS 0 )       
+     ' PLOTPT JSR,                      
+     TYA,         ( CHECK FOR Y=0 )     
+    0= UNTIL,                           
+   THEN,                                
+  THEN, RTS,                            
+END-CODE                                
+-------------------------------------------- SCREEN 019
+( SCANSCR: UPVARS        < 5/31/84>159) 
+                                        
+CODE UPVARS ( UPDATE VARS FOR NEXT COL) 
+                                        
+  COL INC,   ( NEXT COLUMN )            
+  MASK LDA,  ( MAKE NEW MASK )          
+  CLC,                                  
+  .A ROL,    ( SHIFT THE BIT MASK )     
+  0< IF,     ( MASK SHIFTED INTO BIT 7) 
+   1 # LDA,  ( RESET MASK )             
+   OFFS INC,                            
+  THEN,                                 
+  MASK STA,                             
+                                        
+  COL LDA,    ( UPDATE HARDWARE COLUMN) 
+  DENSLT # LDX,                         
+  COLUMN ,X STA,                        
+  RTS,                                  
+END-CODE                                
+                                        
+                                        
+                                        
+                                        
+                               ( 13:22) 
+-------------------------------------------- SCREEN 020
+( SCANSCR: MAINR         < 5/31/84>160) 
+                                        
+CODE MAINR ( MAIN ROUTINE )             
+  XSAVE STX,                            
+  BEGIN,                                
+   NUMR LDY, ( NUMBER OF ROWS )         
+   ' WAIT-VSYNC JSR,                    
+   0 # LDA,     ( ZERO BUFFER POINTER ) 
+   PBOFFS STA,                          
+   DENSLT # LDX,                        
+   ' !PBUF JSR,                         
+   ' PLOTBUF JSR,                       
+   COL LDA,                             
+   LCOL CMP,  ( SCANNED ALL COLUMNS?)   
+   0= NOT IF,  ( MORE TO SCAN )         
+    ' UPVARS JSR,                       
+   THEN,                                
+  0= UNTIL,                             
+  XSAVE LDX,                            
+  NEXT JMP,                             
+END-CODE                                
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 021
+( SCANSCR                < 5/31/84>162) 
+                                        
+: SCANSCR ( UPPER LOWER COLOR -- )      
+  DUP COLOR !                           
+  DUP 3 AND                             
+  IF  ( THERE IS A PLOT COLOR )         
+   4 AND IF 128 ELSE 0 THEN             
+   CLHGR HGR                            
+   LWR !                                
+   UPR !                                
+   SINIT                                
+   MAINR                                
+   BEEP                                 
+  ELSE                                  
+   DROP DROP CR                         
+   CR ." NO CHANGE WOULD RESULT IN" CR  
+   ." PLOTTING IN BLACK " CR CR         
+   BEEP BEEP                            
+  THEN                                  
+;                                       
+                                        
+                                        
+                                        
+                               ( 13:22) 
+-------------------------------------------- SCREEN 022
+( SL                     < 5/31/84>162) 
+                                        
+: SL ( SCANS SAME AS BEFORE )           
+  UPR @ LWR @ COLOR @ SCANSCR ;         
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               ( 13:22) 
+-------------------------------------------- SCREEN 023
+( MIX, FULL, HGR, TEXT   < 5/31/84>162) 
+HEX                                     
+                                        
+: MIX C053 C@ DROP ;                    
+                                        
+: FULL C052 C@ DROP ;                   
+                                        
+: HGR C057 C@ DROP                      
+      C050 C@ DROP                      
+      C055 C@ DROP ;                    
+                                        
+: TEXT C051 C@ DROP                     
+       C054 C@ DROP                     
+       FULL ;                           
+                                        
+: CLHGR ( N -- FILLS PAGE TWO WITH N )  
+  4000 1FFF ROT FILL ;                  
+                                        
+DECIMAL                                 
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 024
+                                        
+0     CONSTANT IBM                      
+1     CONSTANT APPLE                    
+APPLE CONSTANT SMODE  ( SAVE MODE )     
+                                        
+VARIABLE XSIZ                           
+VARIABLE YSIZ                           
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 025
+( INPUT                  < 5/31/84>165) 
+VARIABLE MXLN  VARIABLE BADR            
+                                        
+: INPUT ( ADDR CNT -- )                 
+  MXLN ! DUP BADR !                     
+  MXLN @ 32 FILL                        
+  0                                     
+  BEGIN                                 
+   KEY DUP 8 = IF ( BACK SPACE )        
+    OVER 0 > IF                         
+     8 EMIT 32 EMIT 8 EMIT              
+     SWAP 1- SWAP                       
+    ELSE BEEP THEN                      
+   ELSE                                 
+    DUP 31 > OVER 127 < AND IF          
+     OVER MXLN @ < IF                   
+      DUP EMIT                          
+      SWAP 1+ SWAP DUP 3 PICK BADR @ +  
+      C!                                
+     ELSE BEEP THEN                     
+    THEN                                
+   THEN                                 
+  13 = UNTIL                            
+  BADR @ C! ;                           
+-------------------------------------------- SCREEN 027
+( PRBOX                  < 5/31/84>167) 
+                                        
+: PRBOX ( PRINTS THE BOX AROUND THE     
+          64 X 63 AREA )                
+                                        
+3 XSIZ @ 7 MOD 0 DO 2* LOOP             
+ YSIZ @ 0 DO                            
+   I 2* YADDRESS + @ 8192 +             
+   DUP 3 SWAP C!                        
+   XSIZ @ 7 / + OVER SWAP C!            
+  LOOP DROP                             
+                                        
+  YSIZ @ 2* YADDRESS + @ 8192 +         
+  XSIZ @ 7 / 0 DO                       
+   127 OVER C! 1+ LOOP DROP             
+                                        
+  YADDRESS @ 8192 +                     
+  XSIZ @ 7 / 0 DO                       
+   127 OVER C! 1+ LOOP DROP ;           
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 030
+( YADDRESS TABLE, PAGE 1 < 5/31/84>170) 
+                                        
+CREATE  YADDRESS                        
+ 8192 ,  9216 , 10240 , 11264 , 12288 , 
+13312 , 14336 , 15360 ,  8320 ,  9344 , 
+10368 , 11392 , 12416 , 13440 , 14464 , 
+15488 ,  8448 ,  9472 , 10496 , 11520 , 
+12544 , 13568 , 14592 , 15616 ,  8576 , 
+9600  , 10624 , 11648 , 12672 , 13696 , 
+14720 , 15744 ,  8704 ,  9728 , 10752 , 
+11776 , 12800 , 13824 , 14848 , 15872 , 
+ 8832 ,  9856 , 10880 , 11904 , 12928 , 
+13952 , 14976 , 16000 ,  8960 ,  9984 , 
+11008 , 12032 , 13056 , 14080 , 15104 , 
+16128 ,  9088 , 10112 , 11136 , 12160 , 
+13184 , 14208 , 15232 , 16256 ,  8232 , 
+ 9256 , 10280 , 11304 , 12328 , 13352 , 
+14376 , 15400 ,  8360 ,  9384 , 10408 , 
+11432 , 12456 , 13480 , 14504 , 15528 , 
+ 8488 ,  9512 , 10536 , 11560 , 12584 , 
+13608 , 14632 , 15656 ,  8616 ,  9640 , 
+10664 , 11688 , 12712 , 13736 , 14760 , 
+15784 ,  8744 ,  9768 , 10792 , 11816 , 
+12840 , 13864 , 14888 , 15912 ,         
+-------------------------------------------- SCREEN 031
+( YADDRESS TABLE, PAGE 2 < 5/31/84>171) 
+ 8872 ,  9896 , 10920 , 11944 , 12968 , 
+13992 , 15016 , 16040 ,  9000 , 10024 , 
+11048 , 12072 , 13096 , 14120 , 15144 , 
+16168 ,  9128 , 10152 , 11176 , 12200 , 
+13224 , 14248 , 15272 , 16296 ,  8272 , 
+ 9296 , 10320 , 11344 , 12368 , 13392 , 
+14416 , 15440 ,  8400 ,  9424 , 10448 , 
+11472 , 12496 , 13520 , 14544 , 15568 , 
+ 8528 ,  9552 , 10576 , 11600 , 12624 , 
+13648 , 14672 , 15696 ,  8656 ,  9680 , 
+10704 , 11728 , 12752 , 13776 , 14800 , 
+15824 ,  8784 ,  9808 , 10832 , 11856 , 
+12880 , 13904 , 14928 , 15952 ,  8912 , 
+ 9936 , 10960 , 11984 , 13008 , 14032 , 
+15056 , 16080 ,  9040 , 10064 , 11088 , 
+12112 , 13136 , 14160 , 15184 , 16208 , 
+ 9168 , 10192 , 11216 , 12240 , 13264 , 
+14288 , 15312 , 16336 ,                 
+                                        
+                                        
+                                        
+                                        
+                               ( 13:22) 
+-------------------------------------------- SCREEN 040
+( VIRTUAL DATA BASE      < 4/ 5/84> 55) 
+VARIABLE VADR  VARIABLE VCNT            
+                                        
+: @VIR1 ( OFFSET 32N -- )               
+   VADR @ >R  VCNT @ >R  @ADR           
+   I OVER > IF                          
+    DDUP I' SWAP CMOVE  R> OVER -       
+    R> SWAP >R + >R DROP 1+ BLOCK       
+    R> R> CMOVE                         
+   ELSE                                 
+    DROP R> R> SWAP CMOVE DROP THEN ;   
+                                        
+: @VIR ( OFFSET 32N --  )               
+   VCNT @ VADR @ >R >R                  
+   BEGIN VCNT @ 1024 > WHILE  DDUP      
+    VCNT @ >R 1024 VCNT ! @VIR1 1024.   
+    D+ R> 1024 - VCNT ! 1024 VADR +!    
+    REPEAT  VCNT @ IF @VIR1  ELSE       
+    DDROP  THEN R> R> VADR ! VCNT ! ;   
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 041
+( VIRTUAL DATA BASE      < 4/ 5/84> 56) 
+                                        
+: !VIR1 ( OFFSET 32N -- )               
+   @ADR  VCNT @ DUP >R  VADR @ >R       
+   OVER > IF                            
+    DDUP I -ROT CMOVE UPDATE R> OVER +  
+    R> SWAP >R SWAP - >R DROP UPDATE    
+    1+ BLOCK R> R> -ROT CMOVE           
+   ELSE                                 
+    DROP SWAP DROP R> SWAP R> CMOVE     
+   THEN UPDATE ;                        
+                                        
+: !VIR ( OFFSET 32N --  )               
+   VCNT @ VADR @ >R >R                  
+   BEGIN VCNT @ 1024 > WHILE  DDUP      
+    VCNT @ >R 1024 VCNT ! !VIR1 1024.   
+    D+ R> 1024 - VCNT ! 1024 VADR +!    
+    REPEAT  VCNT @ IF !VIR1  ELSE       
+    DDROP  THEN R> R> VADR ! VCNT ! ;   
+                                        
+                                        
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 050
+( SAVEIBM: VARS          < 5/31/84>190) 
+                                        
+0 CONSTANT SCRLOC                       
+0 CONSTANT BUFPNTR                      
+  VARIABLE GET.MASK                     
+  VARIABLE PUT.MASK                     
+  VARIABLE START.PUT.MASK               
+  VARIABLE BACK.MASK                    
+  VARIABLE AND.POS                      
+                                        
+2 BASE !                                
+  CREATE AND.TAB                        
+   00111111 C, 11001111 C,              
+   11110011 C, 11111100 C,              
+DECIMAL                                 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 051
+( SAVEIBM: GET.PIX       < 5/31/84>191) 
+                                        
+: GET.PIX ( -- F : READS NEXT PIXEL )   
+  SCRLOC @ GET.MASK @ AND ( TEST BIT )  
+  GET.MASK @ 2* DUP GET.MASK !          
+     ( UPDATE THE MASK )                
+  127 > IF ( MOVE TO NEXT BYTE )        
+    1 GET.MASK !                        
+    SCRLOC 1+ ' SCRLOC !                
+  THEN ;                                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 052
+( PUT.PIX                < 5/31/84>192) 
+                                        
+: PUT.PIX ( F -- : PUT PIX IF F=TRUE )  
+  IF                                    
+   BUFPNTR C@ AND.POS @ AND.TAB + C@    
+   AND PUT.MASK @ OR                    
+   BUFPNTR C! ( OR IN MASK )            
+  THEN                                  
+  1 AND.POS +!                          
+  PUT.MASK @ 2/ 2/ DUP PUT.MASK !       
+    ( UPDATE THE MASK )                 
+  0 = IF ( MOVE TO NEXT BYTE )          
+    0 AND.POS !                         
+    START.PUT.MASK @ PUT.MASK !         
+    BUFPNTR 1+ ' BUFPNTR !              
+    BUFPNTR NEWBLK - 1023 > IF          
+     ( FILLED A BLOCK )                 
+      WRITEBLK NEWBLK ' BUFPNTR !       
+      NEWBLK 1024 0 FILL THEN           
+    BACK.MASK @ BUFPNTR !               
+  THEN ;                                
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 053
+( SAVEIBM                < 5/31/84>193) 
+                                        
+: SAVEIBM ( ADDR -- SAVES UPPR          
+   LEFT CORNER IN IBM FORMAT.           
+   EACH BIT LIT ON THE APPLE SCREEN     
+   WILL BE PLOTTED AS COLOR C )         
+  NEWBLK 0 AND.POS !                    
+  DUP 1024 0 FILL                       
+  XSIZ @ OVER ! 2+ YSIZ @ OVER ! 2+     
+    ( SAVE X,Y SIZE IN PIXELS )         
+  ' BUFPNTR ! ( OUTPUT BUFFER )         
+  YSIZ @ 0 DO ( ROW LOOP )              
+   I 2* YADDRESS + @ 8192 + ' SCRLOC !  
+   1 GET.MASK ! 0 AND.POS !             
+   START.PUT.MASK @ PUT.MASK !          
+   XSIZ @ 0 DO ( COLUMN LOOP )          
+    GET.PIX                             
+    PUT.PIX                             
+   LOOP                                 
+   BEGIN PUT.MASK @ START.PUT.MASK @    
+   = NOT WHILE                          
+    0 PUT.PIX REPEAT                    
+  LOOP WRITEBLK                         
+  UPDATE FLUSH SAVEDIR ;       ( 13:22) 
+-------------------------------------------- SCREEN 060
+( XOUT                   < 0/ 0/ 0>101) 
+VARIABLE SLOT16                         
+  3 ( SLOT #) 16 * SLOT16 !             
+HEX                                     
+C088 CONSTANT TDREG                     
+C088 CONSTANT RDREG                     
+C089 CONSTANT STREG                     
+                                        
+CODE XOUT   ( BYTE -- )                 
+  SLOT16 LDY,                           
+  BEGIN,                                
+    STREG ,Y LDA,                       
+    # 70 AND,                           
+    # 10 CMP,                           
+  0= UNTIL,                             
+  BOT LDA,                              
+  TDREG ,Y STA,                         
+POP JMP, C;                             
+                                        
+                                        
+                                        
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 061
+( XIN                    < 0/ 0/ 0>102) 
+CODE XIN   ( -- BYTE )                  
+  SLOT16 LDY,                           
+  BEGIN,                                
+    STREG ,Y LDA,                       
+    # 0F AND,                           
+    # 08 CMP,                           
+  CS UNTIL,                             
+  RDREG ,Y LDA,                         
+  PHA,                                  
+  # 0 LDA,                              
+PUSH JMP, C;                            
+DECIMAL                                 
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 062
+( RCV SEND SERIALIZE     < 0/ 0/ 0>103) 
+: RCV    ( ADDR N -- )                  
+   OVER + SWAP DO XIN I C! LOOP ;       
+                                        
+: SEND   ( ADDR N -- )                  
+   OVER + SWAP DO I C@ XOUT LOOP ;      
+                                        
+: SERIALIZE   ( -- )                    
+   0 SP@ 2 RCV                          
+   DUP 0< IF                            
+     ABS 42 XOUT  PAD 1024 RCV          
+     PAD SWAP BUFFER 1024 CMOVE UPDATE  
+     FLUSH 42 XOUT                      
+   ELSE                                 
+     BLOCK 1024 SEND                    
+   THEN ;                               
+: APPLE-II  ( -- )                      
+   BEGIN SERIALIZE 0 UNTIL ;            
+EXIT                                    
+NOTE: 6502 SENDS WORD AS LO-BYTE, HIGH  
+  IF YOU WANT REVERSE FORMAT FOR SEND-  
+  ING CPU, USE FORTH WORD >< AFTER      
+  "SP@ 2 RCV".                          
+                               (  0:00) 
+-------------------------------------------- SCREEN 063
+( RECV-BLOCK RECV-BLOCKS < 0/ 0/ 0>104) 
+: RECV-BLOCK   ( N -- )                 
+   BLOCK 5 XOUT 1024 RCV UPDATE ;       
+                                        
+: RECV-BLOCKS  ( START NUM -- )         
+   3 PR# 3 IN# 32 EMIT 0 PR# 0 IN#      
+   CR CR                                
+   OVER + SWAP DO                       
+     ." BLOCK #" I . ." ..."            
+     I RECV-BLOCK ." RECIEVED" CR       
+   LOOP FLUSH ;                         
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 064
+( SEND-BLOCK SEND-BLOCKS < 0/ 0/ 0>105) 
+: SEND-BLOCK   ( N -- )                 
+   BLOCK 1024 SEND ;                    
+                                        
+: SEND-BLOCKS   ( START NUM -- )        
+   3 PR# 32 EMIT 0 PR# CR CR            
+   ." START THE RECIEVE PROGRAM NOW"    
+   CR CR                                
+   OVER + SWAP DO                       
+     BEGIN XIN 127 AND DUP              
+     EMIT 5 = UNTIL                     
+     ." WRITING BLOCK " I . ." ..."     
+     I SEND-BLOCK ." WRITTEN" CR        
+   LOOP ;                               
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 065
+( SEND-TO-IBM            < 5/31/84>205) 
+                                        
+: SEND-TO-IBM                           
+  EMPTY-BUFFERS                         
+  LOADDIR MODE40                        
+  ." SEND FIGURE DISK TO IBM" CR CR     
+  ^NEXTBLOCK @ DUP                      
+  CR CR ." SENDING " . ." BLOCKS TO "   
+  ." THE IBM " CR                       
+  ." PLEASE ENTER THE NUMBER OF "       
+  ." BLOCKS " CR                        
+  ." ON THE IBM TO COMPLETE THE "       
+  ." TRANSFER " CR CR CR CR             
+  ."    ---- PRESS ANY KEY ---- "       
+  KEY DROP                              
+  0 SWAP SEND-BLOCKS                    
+;                                       
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 070
+( DIR: VARS              < 5/31/84>210) 
+                                        
+CREATE DIRBUF 1024 ALLOT                
+                                        
+: ^DIRLEN ( -- ADDR )                   
+   DIRBUF 6 + ;                         
+: ^ENTRYSIZE ( -- ADDR )                
+   DIRBUF 4 + ;                         
+: ^CURENTRY ( -- ADDR )                 
+   DIRBUF 8 + ;                         
+                                        
+: ^ENTRY ( -- ADDR : GET CURRENT ENTRY) 
+   ^CURENTRY @   ( GET CUR ENTRY # )    
+   ^ENTRYSIZE @ * DIRBUF + 4 + 6 + ;    
+: ^NAME ( -- ADDR )                     
+   ^ENTRY ;                             
+: ^BLOCK# ( -- ADDR )                   
+   ^ENTRY 13 + ;                        
+: ^OFFSET ( -- ADDR )                   
+   ^ENTRY 15 + ;                        
+: ^SIZE   ( -- ADDR )                   
+   ^ENTRY 17 + ;                        
+                                        
+                                        
+-------------------------------------------- SCREEN 071
+( DIR: VARS INITDIR      < 5/31/84>211) 
+                                        
+: ^NEXTBLOCK ( -- ADDR )                
+   DIRBUF ;                             
+                                        
+: SAVEDIR                               
+  DIRBUF 0 BLOCK 1024 CMOVE             
+  UPDATE FLUSH ;                        
+                                        
+: LOADDIR                               
+  EMPTY-BUFFERS                         
+  0 BLOCK DIRBUF 1024 CMOVE ;           
+                                        
+240 LOAD                                
+                                        
+EXIT                                    
+: INITDIR ( INITIALIZES DIRECTORY )     
+  DIRBUF 1024 0 FILL                    
+  19 ^ENTRYSIZE !                       
+  1 ^NEXTBLOCK !                        
+  1 ^DIRLEN !                           
+  SAVEDIR ;                             
+                                        
+                                        
+-------------------------------------------- SCREEN 072
+( DIR: SETHEADER         < 5/31/84>212) 
+                                        
+: SETHEADER ( NAMEADDR -- T/F )         
+  1 ^DIRLEN @ + DUP                     
+  50 > ^NEXTBLOCK @ 127 > OR            
+   IF CR CR                             
+   ." NO MORE SPACE ON THIS DISK" CR    
+   ." PLEASE START A NEW DISK" CR CR    
+   ." THE CURRENT FIGURE CAN BE" CR     
+   ." SAVED ON THE NEW DISK." CR CR CR  
+   ." --- PRESS ANY KEY ---" KEY DROP   
+   0 ( INDICATE UNSUCCESFUL )           
+  ELSE                                  
+   1- ^CURENTRY ! ( MAKE NEW CURRENT )  
+   ^NAME 13 BMOVE                       
+   0 ^BLOCK# !     0 ^SIZE !            
+   SMODE APPLE =                        
+   IF SET.VP                            
+   ELSE 0 ^OFFSET ! THEN                
+   1 ^DIRLEN +! ( INCREMENT # ENTRIES ) 
+   1 ( SUCCESFUL OPEN )                 
+  THEN ;                                
+                                        
+                                        
+-------------------------------------------- SCREEN 073
+( DIR: NEWBLK            < 5/31/84>213) 
+                                        
+: NEWBLK ( -- ADDR : RETURNS ADDR OF    
+      THE BLOCK BUFFER FOR THE NEXT     
+      AVIABLE BLOCK )                   
+                                        
+  ^NEXTBLOCK @ BLOCK ;                  
+                                        
+: WRITEBLK ( -- : WRITE THE CURRENT     
+   BLOCK UPDATE NEXTBLOCK )             
+                                        
+  UPDATE FLUSH                          
+  ^BLOCK# @ 0=                          
+  IF ( FIRST BLOCK FOR FIG )            
+    ^NEXTBLOCK @ ^BLOCK# ! THEN         
+    1 SMODE APPLE =                     
+    IF ^ASIZE +!                        
+    ELSE ^SIZE +! THEN                  
+  1 ^NEXTBLOCK +! ;                     
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 074
+( DIRDIR                 < 5/31/84>214) 
+                                        
+: DIRD                                  
+  LOADDIR ^ENTRYSIZE @ 25 =             
+  IF ." APPLE" ELSE ." IBM" THEN        
+  ."  FIGURE DISK" CR CR                
+  ^CURENTRY @ ( SAVE CURRENT )          
+  ^DIRLEN @ 1 DO                        
+    I ^CURENTRY !                       
+    ^NAME COUNT TYPE                    
+    I 3 MOD 0= IF                       
+     CR                                 
+    ELSE                                
+     13 ^NAME C@ DO                     
+      BL EMIT LOOP                      
+    THEN                                
+  LOOP CR CR                            
+  140 ^NEXTBLOCK @ - . ." BLOCKS FREE " 
+  CR CR                                 
+ ^CURENTRY ! ( RESTORE CURRENT )        
+;                                       
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 078
+( SCANMENU: VARIABLES    < 8/ 7/84>218) 
+                                        
+                                        
+: PAKD 2000 0 DO ?TERMINAL IF           
+   LEAVE R> DROP THEN LOOP ;            
+: PAK                                   
+  10 23 XYTAB                           
+  ." ** PRESS ANY KEY **"               
+  1                                     
+  8000 0 DO                             
+    ?TERMINAL                           
+    IF DROP 0 LEAVE THEN                
+  LOOP                                  
+  IF BEGIN                              
+    12 23 XYTAB 14 SPACES PAKD          
+    10 23 XYTAB ." ** PRESS ANY KEY **" 
+    PAKD AGAIN                          
+  THEN ;                                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 079
+( SCANMENU: SET.SMODE    < 8/ 7/84>219) 
+                                        
+: SET.SMODE                             
+  MODE40 ." SELECT SAVE MODE" CR CR     
+  ." USE THIS OPTION TO SELECT THE " CR 
+  ." FORMAT TO SAVE THE PICTURE "    CR 
+  CR ." CURRENT SETTING: "              
+  SMODE IBM = IF ." IBM"                
+              ELSE ." APPLE" THEN CR CR 
+  ." DO YOU WANT TO CHANGE THIS"        
+  (Y/N)? CR CR CR                       
+  IF SMODE NOT ' SMODE !                
+    ." SAVE MODE CHANGED TO "           
+    SMODE IBM = IF ." IBM"              
+              ELSE ." APPLE" THEN       
+                                        
+  ELSE ." SAVE MODE UNCHANGED "         
+  THEN CR CR PAK ;                      
+: GETN ( DEF LOWR UPPR -- NUM -VAL )    
+  PAD 5 INPUT PAD C@ 0 = IF 3 PICK      
+  DUP . ELSE PAD NUMBER DROP THEN       
+  ROT ROT 3 PICK < >R OVER > R> OR      
+  ROT DROP CR ;                         
+                               (  0:00) 
+-------------------------------------------- SCREEN 080
+( SCANMENU: INITDSK SCAN < 8/ 7/84>220) 
+                                        
+: INITDSK                               
+  MODE40 ." INITIALIZE DISK " CR CR     
+  CR CR ." THIS WILL REMOVE ALL "       
+  ." FIGURES FROM " CR                  
+  ." THE CURRENT DISK!" CR CR BEEP      
+  ." CONTINUE " (Y/N)? CR               
+  IF                                    
+   CR CR ." INSERT A BLANK "            
+   ." DISK INTO DRIVE ONE" CR           
+   ." THEN PRESS SPACE "                
+   BEGIN KEY 32 = UNTIL CR CR           
+   INITDISK                             
+   SMODE IBM = IF IBMINITDIR THEN       
+   SMODE APPLE = IF APPINITDIR THEN     
+   CR ." OPERATION COMPLETE" PAK        
+  THEN ;                                
+                                        
+: SCAN                                  
+  HGR SL                                
+  BEEP KEY DROP TEXT CR ;               
+                                        
+                                        
+-------------------------------------------- SCREEN 081
+( SCANMENU: SET.MASK     < 8/ 7/84>221) 
+                                        
+CREATE NAME 15 ALLOT                    
+                                        
+: SET.MASK                              
+  CR                                    
+  ." 0=BACKGROUND  1=GREEN/CYAN" CR     
+  ." 2=RED/MAGENTA 3=WHITE/YELLOW" CR   
+  CR BEGIN                              
+   ." SAVE AS IBM COLOR (0-3) -- "      
+   3 0 3 GETN                           
+  WHILE DROP                            
+  REPEAT 64 *                           
+  BEGIN                                 
+   ." IBM BACKGROUND COLOR "            
+   ." (0-3) -- "                        
+   0 0 3 GETN                           
+  WHILE DROP                            
+  REPEAT CR                             
+  DUP 4 * OVER DUP 16 * SWAP            
+  DUP 64 * + + + BACK.MASK !            
+  DUP 4 * SWAP DUP 16 * + + +           
+  START.PUT.MASK ! ;                    
+                               (  0:00) 
+-------------------------------------------- SCREEN 082
+( SCANMENU: SAVEFIG      < 5/31/84>222) 
+                                        
+: SAVEFIG                               
+  MODE40 ." SAVE VIEWPORT TO DISK"      
+  CR CR DIRD CR CR                      
+  CHECK.TYPE                            
+  ." FIGURE NAME -- "                   
+  NAME 12 INPUT CR                      
+  NAME C@ 0= NOT IF ( NAME INPUT )      
+   NAME SETHEADER                       
+   IF ( THE FIGURE CAN BE CREATED )     
+    SMODE IBM = IF SET.MASK THEN        
+    CR CR ." CONFIRM STORE " (Y/N)?     
+    IF CR CR ." PLEASE WAIT ..... "     
+     SMODE IBM = IF SAVEIBM THEN        
+     SMODE APPLE = IF SAVEAPPLE THEN    
+     ." DONE " CR                       
+     SMODE APPLE = IF ^ASIZE THEN       
+     SMODE IBM = IF ^SIZE THEN          
+     @ . ." BLOCKS WRITTEN " CR         
+     PAK                                
+    THEN                                
+   THEN                                 
+  THEN ;                                
+-------------------------------------------- SCREEN 083
+( SCANMENU: SETSCAN      < 8/ 7/84>223) 
+                                        
+: SETSCAN                               
+  MODE40 ." SET INTENSITY VALUES " CR   
+  CR ." CURRENT : UPPPER = " UPR @ . CR 
+  ."           LOWER  = " LWR @ . CR    
+  SMODE APPLE = IF 10 SPACES            
+  ." COLOR = " COLOR @ . CR THEN CR     
+  BEGIN ." NEW UPPER VALUE (1-255) - "  
+     UPR @ 1 255 GETN                   
+  WHILE DROP BEEP REPEAT UPR !          
+  BEGIN ." NEW LOWER VALUE (1-255) - "  
+     LWR @ 1 255 GETN                   
+  WHILE DROP BEEP REPEAT LWR !          
+  SMODE APPLE = IF                      
+   BEGIN ." NEW COLOR (1-3, 5-7)    - " 
+     COLOR @ 1 7 GETN OVER 4 = OR       
+   WHILE DROP BEEP REPEAT               
+  ELSE 3 THEN COLOR ! ;                 
+                                        
+                                        
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 084
+( SCANMENU: SETSIZ       < 8/ 7/84>224) 
+                                        
+: SETSIZ                                
+  MODE40 ." SET VIEWPORT SIZE" CR CR    
+  ." CURRENT : X WIDTH = " XSIZ @ . CR  
+  ."           Y WIDTH = " YSIZ @ .     
+  CR CR BEGIN                           
+   ." NEW X WIDTH (10-255) --> "        
+   XSIZ @ 10 255 GETN                   
+  WHILE DROP BEEP                       
+  REPEAT                                
+  DUP XSIZ ! LCOL !                     
+  BEGIN                                 
+   ." NEW Y WIDTH (10-192) --> "        
+   YSIZ @ 10 192 GETN                   
+  WHILE DROP BEEP                       
+  REPEAT                                
+  DUP YSIZ ! NUMR ! CR                  
+  ." VIEW NEW VEIWPORT " (Y/N)? IF      
+    0 CLHGR PRBOX HGR BEEP              
+    KEY DROP TEXT THEN ;                
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 085
+( POS                    < 8/ 7/84>225) 
+                                        
+: POS                                   
+  MODE40 ." SHOW POSITION GUIDES " CR   
+  CR ." INSTRUCTIONS " (Y/N)? CR        
+  IF MODE40 ." SHOW POSITION GUIDES "   
+  CR CR                                 
+  ." ADJUST THE MONITOR PAN POT SO" CR  
+  ." THAT BOTH THE TV IMAGE AND" CR     
+  ." COMPUTER IMAGE CAN BE SEEN AT" CR  
+  ." THE SAME TIME. " CR                
+  ." THEN POSITION YOUR DRAWING" CR     
+  ." SO IT IS WITHIN THE BOX." CR       
+  ." PRESS ANY KEY WHEN DONE." CR CR    
+  PAK                                   
+  THEN                                  
+  0 CLHGR HGR                           
+  PRBOX                                 
+  KEY DROP TEXT                         
+;                                       
+                                        
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 086
+( DIRFIGS                < 8/ 7/84>226) 
+                                        
+: DIRFIGS                               
+  MODE40                                
+  ." CATALOG OF FIGURES ON CURRENT "    
+  ." DISK: " CR CR                      
+  DIRD                                  
+  PAK ;                                 
+                                        
+: VIEW                                  
+  CR HGR BEEP                           
+  KEY DROP ;                            
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 087
+( MENUCHOICES            < 8/ 7/84>227) 
+                                        
+: MENUCHOICES                           
+  MODE40 ." MAIN MENU VER 1.50" CR CR   
+  ." A = SCAN SCREEN" CR                
+  ." B = SAVE FIGURE TO DISK" CR        
+  ." C = CATALOG OF FIGURES" CR         
+  ." D = SET INTENSITY/COLOR VALUES" CR 
+  ." E = SET VIEWPORT SIZE" CR          
+  ." F = VIEW SCREEN" CR                
+  ." G = DISPLAY POSITIONING GUIDES" CR 
+  ." H = CHANGE TARGET COMPUTER" CR     
+  ." I = SEND FIGURES TO IBM " CR       
+  ." J = INITIALIZE DATA DISK" CR       
+  ." X = EXIT THE PROGRAM " CR CR       
+  ." ENTER SELECTION: "                 
+;                                       
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 088
+( SCANMENU               < 5/31/84>228) 
+                                        
+CREATE EXEC-TABLE                       
+  ' SCAN CFA ,        ' SAVEFIG CFA ,   
+  ' DIRFIGS CFA ,     ' SETSCAN CFA ,   
+  ' SETSIZ CFA ,      ' VIEW CFA ,      
+  ' POS CFA ,         ' SET.SMODE CFA , 
+  ' SEND-TO-IBM CFA , ' INITDSK CFA ,   
+                                        
+: SCANMENU                              
+  BEGIN FULL                            
+   MENUCHOICES                          
+   BEGIN KEY DUP 64 > OVER 75 < AND     
+     OVER 88 = OR NOT                   
+   WHILE DROP                           
+   REPEAT                               
+   DUP 88 = NOT IF ( NOT EXIT )         
+    DUP 65 - 2* EXEC-TABLE + @ EXECUTE  
+   THEN                                 
+  88 = UNTIL ;                          
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 089
+( RUN                    < 5/31/84>229) 
+                                        
+: RERUN                                 
+  SCANMENU MODE40 CR CR                 
+  ." TYPE 'RUN' TO RESTART" CR          
+  ." TYPE 'RERUN' FOR MAIN MENU" CR     
+  ." TYPE 'BOOT' TO BOOT A DISK" CR CR  
+;                                       
+: RUN MODE40 ." VID-CAM VERSION 1.50 "  
+  CR ." CREATED 12-AUG-84" CR CR CR     
+  ." PLACE A APPLE FIGURE DISK IN" CR   
+  ." DRIVE ONE (SLOT SIX) THEN" CR      
+  ." PRESS SPACE BAR TO CONTINUE"       
+  BEGIN KEY 32 = UNTIL CR CR CR         
+  100 UPR !   1 LWR !                   
+  3 COLOR !   64 DUP XSIZ ! LCOL !      
+  63 DUP YSIZ ! NUMR ! APPLE ' SMODE !  
+  RERUN ;                               
+: BOOT 6 PR# ;                          
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 090
+( GET.BYTE               < 8/ 7/84>230) 
+                                        
+: GET.BYTE ( -- B : READS THE NEXT )    
+           ( BYTE FROM THE LINE )       
+  SCRLOC C@                             
+  1 ' SCRLOC +! ;                       
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 091
+( PUT.BYTE               < 8/ 7/84>231) 
+                                        
+: PUT.BYTE ( B -- * WRITES BYTE B TO )  
+           ( THE OUTPUT BUFFER )        
+  BUFPNTR C!                            
+  1 ' BUFPNTR +!                        
+  BUFPNTR NEWBLK - 1023 >               
+  IF  ( THE BLOCK IS FILLED )           
+    WRITEBLK                            
+    NEWBLK ' BUFPNTR !                  
+    NEWBLK 1024 0 FILL                  
+  THEN ;                                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 092
+( SAVEAPPLE              < 8/ 7/84>232) 
+                                        
+: SAVEAPPLE ( ADDR -- * SAVES FIGURE )  
+  ( IN APPLE FORMAT AS DRAWN         )  
+                                        
+  NEWBLK DUP 1024 0 FILL                
+  ' BUFPNTR ! ( START DATA )            
+  YSIZ @ 0 ( ROW LOOP )                 
+  DO I 2* YADDRESS + @ 8192 +           
+    ' SCRLOC !                          
+    XSIZ @ 14 /MOD SWAP 0= NOT + 2* 0   
+    DO GET.BYTE                         
+       PUT.BYTE                         
+    LOOP                                
+  LOOP                                  
+  WRITEBLK                              
+  UPDATE FLUSH SAVEDIR ;                
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 095
+( EXEC-INIT EXEC-ERASE   < 8/ 2/83> 92) 
+VARIABLE R-DRV    VARIABLE R-SLOT       
+VARIABLE W-DRV    VARIABLE W-SLOT       
+                                        
+( ---, <INITIALIZES W-DRV )             
+: EXEC-INIT  CR ." INITIALIZING" CR 0   
+   W-SLOT @ W-DRV @ 0 0 4 1 RWTS ;      
+                                        
+        ( NFA&PFA: 16799 16812 )        
+: EXEC-ERASE  CR ." ERASING" CR FIRST   
+   PAD - PAD OVER BL FILL 0 256 U/MOD   
+   SWAP DROP SECS/TRK TRKS/HD *         
+   HDS/DRV * OVER /MOD 3 ROLL 3 ROLL    
+   SWAP 0 4 ROLL 0                      
+     DO PAD W-SLOT @ W-DRV @ 4 PICK     
+      SECS/TRK /MOD 0 8 PICK RWTS OVER +
+     LOOP SWAP DROP OVER                
+   IF PAD W-SLOT @ W-DRV @ 4 ROLL       
+    SECS/TRK /MOD 0 7 ROLL RWTS         
+   ELSE DDROP THEN ;                    
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 096
+( NORMDISKS INITDISK     < 7/16/83> 93) 
+                                        
+: NORMDISKS  0 R-DRV ! 6 R-SLOT ! 1     
+   W-DRV ! 6 W-SLOT ! ;                 
+                                        
+: INITDISK  CR                          
+  6 W-SLOT ! 2 W-DRV !                  
+  EXEC-INIT EXEC-ERASE                  
+  NORMDISKS ;                           
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 100
+( APPLE ENTRY DEF        < 8/ 7/84>240) 
+                                        
+: ^VXMIN   ^ENTRY 15 + ;                
+: ^VYMIN   ^ENTRY 17 + ;                
+: ^VXMAX   ^ENTRY 19 + ;                
+: ^VYMAX   ^ENTRY 21 + ;                
+: ^ASIZE   ^ENTRY 23 + ;                
+                                        
+-->                                     
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 101
+                                        
+: IBMINITDIR ( INITIALIZES DIRECTORY )  
+  DIRBUF 1024 0 FILL                    
+  19 ^ENTRYSIZE !                       
+  1 ^NEXTBLOCK !                        
+  1 ^DIRLEN !                           
+  SAVEDIR ;                             
+                                        
+                                        
+                                        
+: APPINITDIR ( INITIALIZES DIRECTORY )  
+  DIRBUF 1024 0 FILL                    
+  25 ^ENTRYSIZE !                       
+  50 DIRBUF 6 + ! ( MAX # FIGURES )     
+  1 ^NEXTBLOCK !                        
+  1 ^DIRLEN !                           
+  SAVEDIR ;                             
+                                        
+                                        
+-->                                     
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 102
+( SET.VP                 < 8/ 7/84>242) 
+( COPY IN THE VIEWPORT INFORMATION TO ) 
+( THE DIRECTORY HEADER                ) 
+                                        
+: SET.VP                                
+  0 ^VXMIN !                            
+  0 ^VYMIN !                            
+  XSIZ @ ^VXMAX !                       
+  YSIZ @ ^VYMAX !                       
+;                                       
+                                        
+                                        
+-->                                     
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 103
+( CHECK.TYPE             < 8/12/84>243) 
+( CHECKS TO MAKE SURE CURRENT DISK IS ) 
+( THE PROPER TYPE BY COMPARING        ) 
+( ^ENTRYSIZE AND SMODE                ) 
+( IF NO MATCH EXITS CALLING WORD      ) 
+                                        
+: CHECK.TYPE                            
+  ^ENTRYSIZE @ 25 = SMODE APPLE = AND   
+  ^ENTRYSIZE @ 19 = SMODE IBM = AND     
+  OR NOT                                
+  IF ( MODES DON'T MATCH )              
+   2BEEP CR CR                          
+." IMPROPER FIGURE DISK FOR CURRENT" CR 
+." TARGET MODE.  CHANGE DISKS OR" CR    
+." TARGET COMPUTER " CR CR PAK          
+   R> DROP                              
+  THEN                                  
+;                                       
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+-------------------------------------------- SCREEN 110
+( GOES INTO              < 8/ 7/84>250) 
+: MYSELF LATEST PFA CFA , ; IMMEDIATE   
+0 VARIABLE GIN                          
+: GIN+ CR GIN @ 2+ DUP GIN ! SPACES ;   
+: DIN CR GIN @ SPACES ;                 
+: GCHK DUP @ 2+ ' COMPILE =             
+  IF 2+ DUP @ 2+ NFA ID. 2+             
+  ELSE DUP @ 2+ DUP ' LIT =             
+    OVER ' BRANCH = OR                  
+    OVER ' 0BRANCH = OR                 
+    OVER ' <LOOP> = OR                  
+    SWAP ' <+LOOP> = OR                 
+  IF 2+ DUP @ SPACE . 2+                
+  ELSE ( DUP @ 2+ ' CLIT = )            
+ ( IF 2+ DUP C@ SPACE . 1+ )            
+ ( ELSE ) DUP @ 2+ ' <."> =             
+     IF 2+ DUP COUNT TYPE               
+        DUP C@ 1+ +                     
+     ELSE 2+ THEN THEN ( THEN ) THEN    
+    -2 GIN +! ;                         
+                                        
+                                        
+                                        
+                               (  0:00) 
+-------------------------------------------- SCREEN 111
+( GOES INTO              < 8/ 7/84>251) 
+                                        
+: <GOESINTO> ( PFA.... )                
+  DUP CFA @ ' : CFA @ =                 
+( OVER ' ERROR = 0= AND )               
+  IF ( COLON DEF. & NOT 'ERROR' )       
+    BEGIN DUP @ DUP ' EXIT CFA =        
+      OVER ' <;CODE> CFA = OR 0=        
+    WHILE ( HIGH LEVEL & NOT END OF )   
+          ( COLON DEFINITION )          
+    2+ DUP GIN+ NFA ID. KEY DUP 81 =    
+    IF ( 'Q' ) SP! QUIT                 
+    ELSE 13 =                           
+      IF ( GO DOWN ONE LEVEL ) MYSELF   
+      ELSE DROP THEN                    
+    THEN GCHK                           
+  REPEAT ( SHOW LAST WORD )             
+  2+ DIN NFA ID.                        
+  THEN DROP ;                           
+: GOINTO -FIND IF DROP 0 GIN !          
+  <GOESINTO> ELSE ." NOT FOUND" THEN ;  
+                                        
+                                        
+                               (  0:00) 
