@@ -5,7 +5,7 @@ This is Apple II source code, in the Forth language, to interface the Apple II w
 
 Not much more is known about this project.
 
-Code written circa August 1984. Released with MIT license 2021 by Lloyd R. Prentice, the developer.
+Code written circa August 1984. 
 
 ( VIDEO-CAM - HARDWARE   < 5/31/84>140) 
                                         
